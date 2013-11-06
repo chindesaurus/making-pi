@@ -95,8 +95,8 @@ let rec ramanujan_pi (i:int): float =
     else 
 
     let factor = (2. *. sqrt 2.) /. 9801. in
-    let num = float_of_int (fact (4 * i) * (1103 + 26390 * i)) in
-    let den = ((float_of_int (fact i)) ** 4.) *. (396. ** (4. *. float_of_int i)) in
+    let num = float (fact (4 * i) * (1103 + 26390 * i)) in
+    let den = ((float (fact i)) ** 4.) *. (396. ** (4. *. float i)) in
  
     match i with
     | 0 -> factor *. 1103.
