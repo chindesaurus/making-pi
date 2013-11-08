@@ -68,9 +68,67 @@ let rec sin_pi (i:int): float =
 
 
 (* print the first few approximations *)
-(print "sin_pi 1 = %s\n" (string_of_float (sin_pi 1));
-print "sin_pi 2 = %s\n" (string_of_float (sin_pi 2));
-print "sin_pi 3 = %s\n" (string_of_float (sin_pi 3));
+(print "sin_pi 1 =        %.15f\n" (sin_pi 1);
+print "sin_pi 2 =        %.15f\n" (sin_pi 2);
+print "sin_pi 3 =        %.15f\n" (sin_pi 3);
+print "----------------------------------------\n";);;
+
+
+
+(*>* Monte Carlo Approximation *>*)
+(* monte_pi : int -> float 
+ *
+ * Pi can be computed using Monte Carlo simulation through a series
+ * of experiments. Here is a single experiment:
+ *
+ *  -- choose a pair of random floating point numbers between 0 and 1
+ *  -- call the numbers x and y 
+ *      -- think of (x,y) as a point on the plane in the unit square
+ *  -- test whether the point falls within the unit circle by measuring
+ *     the distance from the point to the origin:  x^2 + y^2 <= 1
+ *
+ * Now suppose you do m experiments and in n of those experiments, the
+ * random point chosen falls within the upper right quarter of the unit circle.
+ * Since the area of a circle is known to be pi * r^2 and the area of
+ * a square is r^2 (and here we are dealing with a radius/square side
+ * of length 1), the following equations hold:
+
+  n    quarter of area of circle     1/4 * pi * r^2
+ --- = -------------------------  =  -------------- = 1/4 * pi
+  m        area of square                r^2
+
+ * monte_pi takes a positive number indicating the number of random points 
+ * n to sample and approximates pi using that number of random points.
+ * Calls bad_arg when a non-positive argument is thrown.
+ *
+ * Note: this estimation method will converge way more slowly than the
+ * sinusoidal method. May cause stack overflow with large i.
+ *)
+
+Random.init 17;; 
+
+let inUnitCircle () : int = 
+    let x = Random.float 1.0 in
+    let y = Random.float 1.0 in
+    if x *. x +. y *. y <= 1. then 1 else 0;;
+
+let rec numInCircle (i:int) : int = 
+    match i with
+    | 0 -> 0
+    | n -> inUnitCircle() + numInCircle(i - 1);;
+
+
+let monte_pi (i:int): float =
+    if i < 0 then bad_arg (string_of_int i)
+    else
+        4. *. (float (numInCircle i)) /. (float i);;
+
+
+(* print the first few approximations *)
+(print "monte_pi 1 =      %.15f\n" (monte_pi 1);
+print "monte_pi 1000 =   %.15f\n" (monte_pi 1000);
+print "monte_pi 100000 = %.15f\n" (monte_pi 100000);
+print "monte_pi 250000 = %.15f\n" (monte_pi 250000);
 print "----------------------------------------\n";);;
 
 
@@ -104,6 +162,8 @@ let rec ramanujan_pi (i:int): float =
 
 
 (* print the first few approximations *)
-(print "ramanujan_pi 0 = %s\n" (string_of_float (1. /. (ramanujan_pi 0)));
-print "ramanujan_pi 1 = %s\n" (string_of_float (1. /. (ramanujan_pi 1)));
+(print "ramanujan_pi 0 =  %.15f\n" (1. /. (ramanujan_pi 0));
+print "ramanujan_pi 1 =  %.15f\n" (1. /. (ramanujan_pi 1));
+print "ramanujan_pi 2 =  %.15f\n" (1. /. (ramanujan_pi 2));
 print "----------------------------------------\n\n";);;
+
